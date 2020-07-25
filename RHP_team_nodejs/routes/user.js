@@ -10,6 +10,9 @@ const {
 const userController = require('./../controllers/user')
 const user = require('./../controllers/user')
 
+const passport = require('passport')
+const passportConfig = require('../middlewares/passport') // require để đăng kí chứ k cần gọi
+
 
 router.route('/')
     .get(userController.getAllUser)
@@ -17,9 +20,9 @@ router.route('/')
 
 router.route('/signup').post(validateBody(schemas.authSignupSchema), userController.signup)
 
-router.route('/signin').post(validateBody(schemas.authSigninSchema),userController.signin)
+router.route('/signin').post(validateBody(schemas.authSigninSchema), passport.authenticate('local', {session: false}),userController.signin)
 
-router.route('/secret').get(userController.secret)
+router.route('/secret').get(passport.authenticate('jwt', {session: false}), userController.secret) // no sẽ gọi đến hàm giải mã token của pasport
 
 router.route('/:userId')
     .get(validateParams(schemas.idSchema, 'userId') ,userController.getUserById)
