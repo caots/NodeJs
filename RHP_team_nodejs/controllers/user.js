@@ -85,6 +85,14 @@ const newUser = (req, res, next) =>{
 }
 */
 
+//auth facebook
+const authFacebook = async (req, res, next) => {
+    // Assign a token
+     const token = encodedToken(req.user._id)
+    //console.log('request: ',req);
+     res.setHeader('Authorization', token)
+     return res.status(200).json({ success: true })
+  }
 
 // async - await : bản chất vẫn là promise nhưng nó xử lý tốt hơn, multi thread, viết dễ hơn, code clean hơn
 const getAllUser = async (req, res, next) => {
@@ -232,5 +240,6 @@ module.exports = {
     newUserDecks,
     signup,
     signin,
-    secret
+    secret,
+    authFacebook
 }

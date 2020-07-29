@@ -6,8 +6,10 @@ const LocalStrategy = require('passport-local').Strategy
 
 const {ExtractJwt} = require('passport-jwt')
 
-const {JWT_SECRET} = require('../config/index')
+const {JWT_SECRET, auth} = require('../config/index')
 const User = require('../models/User')
+
+const FacebookTokenStrategy = require('passport-facebook-token')
 
 // giai ma token
 passport.use(new JWTStrategy({
@@ -24,6 +26,43 @@ passport.use(new JWTStrategy({
         done(err, false)
     }
 }))
+
+
+// Passport Facebook
+passport.use(
+    new FacebookTokenStrategy(
+      {
+        clientID: auth.facebook.CLIENT_ID,
+        clientSecret: auth.facebook.CLIENT_SECRET,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          // check whether this current user exists in our database
+          const user = await User.findOne({
+            authFacebookID: profile.id,
+            authType: "facebook",
+          });
+  
+          if (user) return done(null, user)
+  
+          // If new accounts
+          const newUser = new User({
+            authType: 'facebook',
+            authFacebookID: profile.id,
+            email: profile.emails[0].value ,
+            name: profile.name.givenName,
+            //lastName: profile.name.familyName
+          })
+
+          await newUser.save()
+          
+          done(null, newUser)
+        } catch (error) {
+          done(error, false);
+        }
+      }
+    )
+  );
 
 // Passport local // ma hoa matkhau
 passport.use(new LocalStrategy({

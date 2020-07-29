@@ -13,6 +13,8 @@ const user = require('./../controllers/user')
 const passport = require('passport')
 const passportConfig = require('../middlewares/passport') // require để đăng kí chứ k cần gọi
 
+router.route('/auth/facebook')
+    .post(passport.authenticate('facebook-token', { session: false }), userController.authFacebook)
 
 router.route('/')
     .get(userController.getAllUser)

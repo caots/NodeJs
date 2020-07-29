@@ -8,30 +8,42 @@ const bcrypt = require('bcryptjs')
 
 const UserSchema = new Schema({
     name: {
-        type: String
+        type: String,
     },
     age: {
-        type: String
+        type: String,
+        require: false
     },
     email: {
         type: String,
         require: true,
         unique: true,
-        lowercase: true
+        lowercase: true,
     },
     password: {
         type: String,
-        require: true
+        require: false
+    },
+    authFacebookID: {
+        type: String,
+        default: null,
+        
+    },
+    authType: {
+        type: String,
+        enum: ['local', 'google', 'facebook'],
+        default: 'local'
     },
     decks : [{ // realtionship
         type: Schema.Types.ObjectId,
-        ref: 'Deck' // ref phai trung ten vs ten Model de nó đi đến model đó để lấy thong tin
+        ref: 'Deck', // ref phai trung ten vs ten Model de nó đi đến model đó để lấy thong tin,
     }]
 })
 
 // encrypt password
 UserSchema.pre('save', async function(next){ // trước khi save , phải viết normal function vì bên duới có this, viết arrow function thì this lại là chính function đó
     try{
+        if(this.authType !== 'local') next()
         // tất cả hảm cảu bcrypt đều là await hết
         // Generate a salt 
         const salt = await bcrypt.genSalt(10)

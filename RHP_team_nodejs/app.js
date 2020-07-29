@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }))
 
-//Middlewares: chay trc khi den request
+//Middlewares
 app.use(logger('dev')) //show ra thông tin 1 request (dev is best)
 
 
